@@ -78,69 +78,43 @@ export function AIChat({ onProductGenerated }: AIChatProps) {
   };
 
   const generateAIResponse = (input: string) => {
-    // Simple AI simulation - extract product information
     const lowerInput = input.toLowerCase();
-    
-    // Try to extract product details
-    const priceMatch = input.match(/[₹$]?(\d+(?:\.\d+)?)\s*(?:per|\/|\-)\s*(\w+)|(\d+(?:\.\d+)?)\s*[₹$]/);
+
+    // Extract price & quantity using regex
+    const priceMatch = input.match(/[₹$]?\s*(\d+(?:\.\d+)?)\s*(?:per|\/|\-)\s*(kg|grams?|pieces?|units?|liters?|bottles?|item|unit)|(\d+(?:\.\d+)?)\s*[₹$]/);
     const quantityMatch = input.match(/(\d+(?:\.\d+)?)\s*(kg|grams?|pieces?|units?|liters?|bottles?)/i);
-    
-    let productName = '';
-    let description = '';
-    let image = '';
-    
-    // Extract product name and assign appropriate placeholder images
-    if (lowerInput.includes('turmeric')) {
-      productName = 'Organic Turmeric Powder';
-      description = 'Pure turmeric powder, sun-dried and hand-ground for authentic flavor and health benefits';
-      image = 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=300&fit=crop';
-    } else if (lowerInput.includes('rice')) {
-      productName = 'Premium Basmati Rice';
-      description = 'High-quality aromatic basmati rice, perfect for special occasions';
-      image = 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=300&fit=crop';
-    } else if (lowerInput.includes('honey')) {
-      productName = 'Pure Organic Honey';
-      description = 'Raw, unprocessed honey directly from local beehives';
-      image = 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=300&fit=crop';
-    } else if (lowerInput.includes('tea') || lowerInput.includes('chai')) {
-      productName = 'Premium Tea Leaves';
-      description = 'Hand-picked tea leaves with rich aroma and authentic taste';
-      image = 'https://images.unsplash.com/photo-1597318181409-cf85347cb07e?w=400&h=300&fit=crop';
-    } else if (lowerInput.includes('spice') || lowerInput.includes('masala')) {
-      productName = 'Traditional Spice Mix';
-      description = 'Authentic blend of traditional spices for authentic cooking';
-      image = 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&h=300&fit=crop';
-    } else {
-      // Generic extraction
-      const words = input.split(' ');
-      productName = words.slice(0, 3).join(' ').replace(/[^\w\s]/g, '');
-      description = `High-quality ${productName.toLowerCase()} sourced locally`;
-      image = 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop';
-    }
 
-    if (priceMatch || quantityMatch) {
-      const price = priceMatch ? `₹${priceMatch[1]}/${priceMatch[2] || 'unit'}` : 'Price on request';
-      const quantity = quantityMatch ? `${quantityMatch[1]} ${quantityMatch[2]}` : 'Quantity available';
+    // Extract possible product name
+    const stopWords = ['i', 'have', 'sell', 'available', 'at', 'for', 'per', '₹', 'rs', 'kg', 'grams', 'pieces', 'units', 'liters', 'bottles', 'unit'];
+    const words = input.split(/\s+/).filter(w => !stopWords.includes(w.toLowerCase()));
+    const productName = words.slice(0, 3).join(' ').replace(/[^\w\s]/g, '').trim();
 
-      const productData = {
-        id: Date.now().toString(),
-        name: productName || 'New Product',
-        description: description || 'Product description',
-        price,
-        quantity,
-        status: 'pending' as const,
-        image: image,
-      };
-
+    // Validate presence of required details
+    if (!productName || !priceMatch || !quantityMatch) {
       return {
-        message: `Great! I've created a product card for "${productData.name}". You can review, edit, and approve it in your catalog. Need to add more products?`,
-        productData,
+        message: `I couldn't find enough details. Please mention the product name, quantity and price. Example: "I sell organic turmeric powder, 5kg available at ₹150 per kg"`,
+        productData: null,
       };
     }
+
+    const description = `Premium quality ${productName.toLowerCase()} perfect for health-conscious buyers and authentic recipes.`;
+
+    const price = priceMatch ? `₹${priceMatch[1]}/${priceMatch[2] || 'unit'}` : 'Price on request';
+    const quantity = quantityMatch ? `${quantityMatch[1]} ${quantityMatch[2]}` : 'Quantity available';
+
+    const productData = {
+      id: Date.now().toString(),
+      name: productName,
+      description: description,
+      price,
+      quantity,
+      status: 'pending' as const,
+      image: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop',
+    };
 
     return {
-      message: "I can help you create product listings! Please include details like product name, price, and quantity. For example: 'Organic turmeric powder, 5kg available, ₹150 per kg'",
-      productData: null,
+      message: `Great! I’ve created a product card for "${productData.name}". You can review, edit, and approve it in your catalog.`,
+      productData,
     };
   };
 
