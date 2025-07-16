@@ -80,16 +80,18 @@ export function AIChat({ onProductGenerated }: AIChatProps) {
   const generateAIResponse = (input: string) => {
     const lowerInput = input.toLowerCase();
 
-    // Extract price & quantity using regex
-    const priceMatch = input.match(/[₹$]?\s*(\d+(?:\.\d+)?)\s*(?:per|\/|\-)\s*(kg|grams?|pieces?|units?|liters?|bottles?|item|unit)|(\d+(?:\.\d+)?)\s*[₹$]/);
-    const quantityMatch = input.match(/(\d+(?:\.\d+)?)\s*(kg|grams?|pieces?|units?|liters?|bottles?)/i);
+    // Extract price value (₹, rupees, rs, $, etc.)
+    const priceMatch = lowerInput.match(/(?:₹|rs\.?|rupees)?\s*(\d+(?:\.\d+)?)/i);
 
-    // Extract possible product name
-    const stopWords = ['i', 'have', 'sell', 'available', 'at', 'for', 'per', '₹', 'rs', 'kg', 'grams', 'pieces', 'units', 'liters', 'bottles', 'unit'];
+    // Extract quantity + unit (like 5kg, 10 ltr)
+    const quantityMatch = lowerInput.match(/(\d+(?:\.\d+)?)\s*(kg|kgs|grams|g|ltr|liters|bottles|pieces|units|packs?)/i);
+
+    // Extract possible product name by removing known words
+    const stopWords = ['i', 'have', 'sell', 'available', 'at', 'for', 'per', 'each', '₹', 'rs', 'rupees', 'kg', 'kgs', 'grams', 'g', 'ltr', 'liters', 'bottles', 'pieces', 'units', 'packs', 'price', 'rs.', 'quantity', 'in', 'of'];
     const words = input.split(/\s+/).filter(w => !stopWords.includes(w.toLowerCase()));
-    const productName = words.slice(0, 3).join(' ').replace(/[^\w\s]/g, '').trim();
+    const productName = words.slice(0, 4).join(' ').replace(/[^\w\s]/g, '').trim();
 
-    // Validate presence of required details
+    // Validate
     if (!productName || !priceMatch || !quantityMatch) {
       return {
         message: `I couldn't find enough details. Please mention the product name, quantity and price. Example: "I sell organic turmeric powder, 5kg available at ₹150 per kg"`,
@@ -97,15 +99,29 @@ export function AIChat({ onProductGenerated }: AIChatProps) {
       };
     }
 
-    const description = `Premium quality ${productName.toLowerCase()} perfect for health-conscious buyers and authentic recipes.`;
+    // 📌 List of possible description templates
+    const descriptionTemplates = [
+      `Premium quality ${productName.toLowerCase()} perfect for health-conscious buyers.`,
+      `Handpicked and naturally processed ${productName.toLowerCase()} for authentic taste.`,
+      `Fresh stock of ${productName.toLowerCase()}, ideal for everyday cooking.`,
+      `Discover the goodness of farm-fresh ${productName.toLowerCase()} at the best price.`,
+      `Authentic ${productName.toLowerCase()} directly sourced from trusted farmers.`,
+      `Ideal for chefs and kitchens, our ${productName.toLowerCase()} adds richness to any dish.`,
+      `Top-selling ${productName.toLowerCase()} — best choice for your pantry.`,
+      `High demand product: Premium ${productName.toLowerCase()} now available.`,
+    ];
 
-    const price = priceMatch ? `₹${priceMatch[1]}/${priceMatch[2] || 'unit'}` : 'Price on request';
-    const quantity = quantityMatch ? `${quantityMatch[1]} ${quantityMatch[2]}` : 'Quantity available';
+    // Pick a random one
+    const randomDescription = descriptionTemplates[Math.floor(Math.random() * descriptionTemplates.length)];
+
+    // ✅ Correctly extract matched groups
+    const price = `₹${priceMatch[1]}`;
+    const quantity = `${quantityMatch[1]} ${quantityMatch[2]}`;
 
     const productData = {
       id: Date.now().toString(),
       name: productName,
-      description: description,
+      description: randomDescription,
       price,
       quantity,
       status: 'pending' as const,
@@ -117,6 +133,7 @@ export function AIChat({ onProductGenerated }: AIChatProps) {
       productData,
     };
   };
+
 
   const handleSendMessage = () => {
     processUserInput(inputValue);
