@@ -12,11 +12,11 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-const GEMINI_API_KEY = 'AIzaSyAIMiWAW0VvxDReT59IiOZu6MsFOoGIcvs';
+const GEMINI_API_KEY = 'AIzaSyA0kjPb6JrG7mcNtM8-_AGENAMyzOKJFEU';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
 mongoose.connect('mongodb://localhost:27017/catalog')
-  .then(() => console.log('✅ Connected to MongoDB'))
+  .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 app.get('/api/products', async (req, res) => {

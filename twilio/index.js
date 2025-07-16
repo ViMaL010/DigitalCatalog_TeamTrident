@@ -6,7 +6,7 @@ const authToken = "accaa1a51390b3c71a1a92fb8837b954";
 const client = require("twilio")(accountSid, authToken);
 
 client.calls.create({
-  url: "https://ec86a4c6a80a.ngrok-free.app/voice",
+  url: "https://32dbba5b109d.ngrok-free.app/voice",
   to: "+918667600879",
   from: "+18153653095"
 })
