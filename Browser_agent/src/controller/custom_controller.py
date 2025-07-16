@@ -195,3 +195,13 @@ class CustomController(Controller):
     async def close_mcp_client(self):
         if self.mcp_client:
             await self.mcp_client.__aexit__(None, None, None)
+
+
+
+    async def log_action_result(self, result: ActionResult, context: str = ""):
+        try:
+            print(f"[Agent LOG - {context}] Final extracted content: {result.extracted_content}")
+            if result.error:
+                print(f"[Agent LOG - {context}] ❌ Error: {result.error}")
+        except Exception as e:
+            print(f"[Agent LOG - {context}] ❗ Logging failed: {e}")
