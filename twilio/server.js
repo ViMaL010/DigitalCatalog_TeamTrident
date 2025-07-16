@@ -37,7 +37,7 @@ app.post('/voice', (req, res) => {
     input: 'speech',
     action: '/process-speech',
     method: 'POST',
-    timeout: 5,
+    timeout: 1,
     speechTimeout: 'auto'
   });
 
