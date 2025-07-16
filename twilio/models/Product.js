@@ -1,3 +1,4 @@
+// models/Product.js
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
@@ -5,8 +6,7 @@ const productSchema = new mongoose.Schema({
   price: String,
   quantity: String,
   category: String,
-  description: String,
-  createdAt: { type: Date, default: Date.now }
-});
+  description: String
+}, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);
