@@ -2,7 +2,7 @@
 // Set environment variables for your credentials
 // Read more at http://twil.io/secure
 const accountSid = "ACabd64862202ee53ac334caaca13c2c96";
-const authToken = "accaa1a51390b3c71a1a92fb8837b954";
+const authToken = "";
 const client = require("twilio")(accountSid, authToken);
 
 client.calls.create({

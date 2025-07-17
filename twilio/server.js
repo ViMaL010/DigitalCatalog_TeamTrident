@@ -12,7 +12,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-const GEMINI_API_KEY = 'AIzaSyA0kjPb6JrG7mcNtM8-_AGENAMyzOKJFEU';
+const GEMINI_API_KEY = '';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
 mongoose.connect('mongodb://localhost:27017/catalog')
